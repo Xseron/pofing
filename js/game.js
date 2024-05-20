@@ -2,10 +2,16 @@ import V2 from "./v2.js";
 import Enemy from "./Enemy.js"
 import Player from "./Player.js"
 
+var mouse_pos;
+
 function Game() {
     this.player = new Player(500, 500);
+    this.mousePos = new V2(0, 0);
 
-    this.enemys = Array.from({ length: 10 }, () => new Enemy(100));
+    this.enemy_delay = 1;
+    this.last_enemy_delta = 0;
+
+    this.enemys = Array.from({ length: 10 }, () => new Enemy(100, 1000, 1000));
 };
 
 Game.prototype.render = function(context) {
@@ -19,6 +25,9 @@ Game.prototype.render = function(context) {
 
 Game.prototype.update = function(dt) {
     this.player.update(dt);
+    this.player.spawnNewBullet(this.mousePos);
+    this.createNewEneemy();
+    this.last_enemy_delta += dt;
     this.enemys.forEach(enemy => enemy.update(dt, this.player.pos));
 
     this.enemys.forEach((enemy, enemy_index) => {
@@ -34,14 +43,23 @@ Game.prototype.update = function(dt) {
     }) 
 };
 
+Game.prototype.createNewEneemy = function(){
+    if (this.last_enemy_delta > this.enemy_delay){
+        console.log(this.WHeight);
+        this.enemys = this.enemys.concat(new Enemy(Math.random() * 300, this.WHeight, this.WWeightw));
+        this.last_enemy_delta = 0;
+    }
+}
+
+Game.prototype.updateMousePos = function(mouse_pos) {
+    this.mousePos = mouse_pos || new V2(0, 0);
+}
+
 Game.prototype.chekCircleColision = function (first_sprite, second_sprite) { 
     return first_sprite.pos.sub(second_sprite.pos).size() <= first_sprite.radius + second_sprite.radius;
 };
 
-document.addEventListener("mousedown", (event) => {
-    const mousePos = new V2(event.clientX, event.clientY);
-    game.player.spawnNewBullet(mousePos);
-});
+document.addEventListener("mousemove", event => mouse_pos = new V2(event.clientX, event.clientY));
 
 const game = new Game();
 
@@ -58,6 +76,7 @@ const game = new Game();
         canvas.height = window.innerHeight;
 
         game.update(dt);
+        game.updateMousePos(mouse_pos);
         game.render(context);
         
         window.requestAnimationFrame(step);

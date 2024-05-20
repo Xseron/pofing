@@ -9,5 +9,5 @@ Bullet.prototype.update = function(dt) {
     this.pos = this.pos.sub(this.vel.scale(dt));
 }
 Bullet.prototype.render = function(context) {
-    drawCircle(context, this.pos, this.radius, 'blue');
+    drawCircle(context, this.pos, this.radius, 'blue'); 
 }

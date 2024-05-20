@@ -1,6 +1,6 @@
 import V2 from "./v2.js";
 import Bullet from "./Bullet.js"
-import { drawCircle, drawProgressBar } from "./Graphics.js"
+import { drawStrokeCircle, drawProgressBar, drawRect, drawfillRect, drawCircle } from "./Graphics.js"
 
 const pressedKeys = new Set();
 
@@ -17,6 +17,7 @@ export default function Player(x, y){
     this.pos = new V2(x, y);
     this.bullet_delay = 1;
     this.last_bullet_delta = 0;
+    this.is_face_right = true;
 
     this.dmg_get_delay = 0.1;
     this.last_dmg_delta = 0;
@@ -29,8 +30,56 @@ export default function Player(x, y){
 }
 
 Player.prototype.render = function(context) {
-    drawCircle(context, this.pos, this.radius);
-    drawProgressBar(context, this.pos.subXY(this.radius, -this.radius-10), 2 * this.radius, 20, Math.max(this.hp, 0), this.max_hp)
+    const border = 2 * this.radius;
+    const eyeBorder = this.radius / 2;
+
+    drawfillRect(context, this.pos.subXY(this.radius, this.radius), border, border, "#a28f7e");
+
+    // face + eyes
+    if (this.hp > 0){
+        drawCircle(context, this.pos.subXY(-border/8, border/5), this.radius/4, "white");
+        drawStrokeCircle(context, this.pos.subXY(-border/8, border/5), this.radius/4, "black", 1);
+        drawCircle(context, this.pos.subXY(border/4, border/5), this.radius/4, "white");
+        drawStrokeCircle(context, this.pos.subXY(border/4, border/5), this.radius/4, "black", 1);
+
+        drawCircle(context, this.pos.subXY(border/4, border/5), this.radius/8, "black");
+        drawCircle(context, this.pos.subXY(-border/8, border/5), this.radius/8, "black");
+    } else {
+        context.beginPath();
+        context.lineWidth = 3;
+        context.moveTo(this.pos.x - border / 3, this.pos.y - border / 4);
+        context.lineTo(this.pos.x - border / 3 + eyeBorder, this.pos.y - border / 4 + eyeBorder); 
+        context.moveTo(this.pos.x - border / 3 + eyeBorder, this.pos.y - border / 4);
+        context.lineTo(this.pos.x - border / 3, this.pos.y - border / 4 + eyeBorder); 
+
+        context.moveTo(this.pos.x, this.pos.y - border / 4);
+        context.lineTo(this.pos.x + eyeBorder, this.pos.y - border / 4 + eyeBorder); 
+        context.moveTo(this.pos.x + eyeBorder, this.pos.y - border / 4);
+        context.lineTo(this.pos.x, this.pos.y - border / 4 + eyeBorder); 
+        
+        context.stroke();
+    }
+
+    // smile
+    if (this.hp > 80){
+        context.beginPath();
+        context.lineWidth = 3;
+        context.arc(this.pos.x, this.pos.y, this.radius - 10, (1 / 4) * Math.PI,  (3 / 4) * Math.PI);
+        context.stroke();
+    } else if (this.hp > 40){
+        context.beginPath();
+        context.lineWidth = 3;
+        context.moveTo(this.pos.x - border / 4, this.pos.y + border / 4); // Move the pen to (30, 50)
+        context.lineTo(this.pos.x + border / 4, this.pos.y + border / 4); // Draw a line to (150, 100)
+        context.stroke();
+    } else {
+        context.beginPath();
+        context.lineWidth = 3;
+        context.arc(this.pos.x, this.pos.y + border / 2, this.radius - 10, (5 / 4) * Math.PI,  (7 / 4) * Math.PI);
+        context.stroke();
+    }
+    
+    if (this.hp < 100) drawProgressBar(context, this.pos.subXY(this.radius, -this.radius-10), 2 * this.radius, 20, Math.max(this.hp, 0), this.max_hp)
 
     this.bullets.forEach(bullet => bullet.render(context));
 }

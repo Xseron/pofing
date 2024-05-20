@@ -5,6 +5,28 @@ const drawCircle = (context, center, radius, color = "green") => {
     context.fill();
 };
 
+const drawStrokeCircle = (context, center, radius, color = "green", width=2) => {
+    context.beginPath();
+    context.arc(center.x, center.y, radius, 0, 2 * Math.PI);
+    context.lineWidth = width;
+    context.fillStyle = color;
+    context.stroke();
+};
+
+const drawRect = (context, startPos, width, height, color = "green") => {
+    context.beginPath();
+    context.lineWidth = "5";
+    context.strokeStyle = color;
+    context.rect(startPos.x, startPos.y, width, height);
+    context.stroke();
+};
+
+const drawfillRect = (context, startPos, width, height, color = "green") => {
+    context.beginPath();
+    context.fillStyle = color;
+    context.fillRect(startPos.x, startPos.y, width, height);
+};
+
 const drawProgressBar = (context, start_pos, width, height, current=0, max=100, color_progress="green", color_bg="black") => {
     context.beginPath();
     context.fillStyle = color_bg;
@@ -28,4 +50,4 @@ const drawRectangle = (context, startpoint, size, rotation, color="green", angle
     context.fill(path);
 }
 
-export {drawCircle, drawRectangle, drawProgressBar}
+export {drawCircle, drawRectangle, drawProgressBar, drawStrokeCircle, drawRect, drawfillRect}
