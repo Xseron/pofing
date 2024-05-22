@@ -11,7 +11,7 @@ function Game() {
     this.enemy_delay = 1;
     this.last_enemy_delta = 0;
 
-    this.enemys = Array.from({ length: 10 }, () => new Enemy(100, 1000, 1000));
+    this.enemys = Array.from({ length: 1 }, () => new Enemy(100, 1000, 1000));
 };
 
 Game.prototype.render = function(context) {
@@ -25,7 +25,7 @@ Game.prototype.render = function(context) {
 
 Game.prototype.update = function(dt) {
     this.player.update(dt);
-    this.player.spawnNewBullet(this.mousePos);
+    this.player.updateMousePos(this.mousePos);
     this.createNewEneemy();
     this.last_enemy_delta += dt;
     this.enemys.forEach(enemy => enemy.update(dt, this.player.pos));
